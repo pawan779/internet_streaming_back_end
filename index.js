@@ -1,7 +1,19 @@
 const express=require('express')
 const mongoose=require('mongoose')
+const bodyParser=require("body-parser")
+const morgan=require("morgan")
 const dotenv=require('dotenv').config();
 const app=express();
+
+const authRoute=require('./src/routes/auth')
+
+
+app.use(bodyParser.json())
+app.use(morgan("tiny"))
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(__dirname + "/public"));
+
+
 
 // mongodb connection
 const mongoUri =process.env.MONGODB;
@@ -20,6 +32,8 @@ mongoose.connection.on("error", (err) => {
   console.log("Unable to connect to mongodb");
 });
 
+
+app.use('/',authRoute)
 
 // server connection
 app.listen(process.env.PORT,()=>{
