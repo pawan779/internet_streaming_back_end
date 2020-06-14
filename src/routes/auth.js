@@ -8,9 +8,8 @@ const User = require("../model/user");
 router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
 
-  if(!email || !password)
-  {
-      return res.status(422).send({error:"Email and password is required"})
+  if (!email || !password) {
+    return res.status(422).send({ error: "Email and password is required" });
   }
 
   const isMatch = await User.findOne({ email });
@@ -38,4 +37,29 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-module.exports=router
+router.post("/signin", async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(422).send({ error: "Email and password is required" });
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(422).send({ error: "Invalid email or password" });
+  }
+  try {
+    const isMatch = await bcrypt.compare(password,user.password);
+    if (!isMatch) {
+      return res.status(422).send({ error: "Invalid email or password" });
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET);
+    res.json({
+      token,
+      isAdmin: user.isAdmin,
+    });
+  } catch (err) {
+    res.status(422).send({ error: "Invalid email or password" });
+  }
+});
+
+module.exports = router;
