@@ -1,29 +1,27 @@
-const express=require('express')
-const mongoose=require('mongoose')
-const bodyParser=require("body-parser")
-const morgan=require("morgan")
-const dotenv=require('dotenv').config();
-const app=express();
-const cors=require('cors')
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const morgan = require("morgan");
+const dotenv = require("dotenv").config();
+const app = express();
+const cors = require("cors");
 
-const authRoute=require('./src/routes/auth')
+const authRoute = require("./src/routes/auth");
+const movieRoute = require("./src/routes/movie");
 
-
-app.use(bodyParser.json())
-app.use(morgan("tiny"))
-app.use(cors())
+app.use(bodyParser.json());
+app.use(morgan("tiny"));
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
 
-
-
 // mongodb connection
-const mongoUri =process.env.MONGODB;
+const mongoUri = process.env.MONGODB;
 mongoose.connect(mongoUri, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useUnifiedTopology: true,
-  useFindAndModify:false
+  useFindAndModify: false,
 });
 
 mongoose.connection.on("connected", () => {
@@ -34,11 +32,10 @@ mongoose.connection.on("error", (err) => {
   console.log("Unable to connect to mongodb");
 });
 
-
-app.use('/',authRoute)
+app.use("/", authRoute);
+app.use("/movie", movieRoute);
 
 // server connection
-app.listen(process.env.PORT,()=>{
-    console.log(`Connected on port ${process.env.PORT}`)
-})
-
+app.listen(process.env.PORT, () => {
+  console.log(`Connected on port ${process.env.PORT}`);
+});
