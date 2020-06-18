@@ -1,0 +1,49 @@
+const mongoose = require("mongoose");
+
+const MovieSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    unique: true,
+    // required: true,
+  },
+  description: {
+    type: String,
+    // required: true,
+  },
+  image: {
+    type: String,
+  },
+  video: {
+    type: String,
+  },
+  views: {
+    type: Number,
+    default: 0,
+  },
+  genre: [
+    {
+      genreId: String,
+    },
+  ],
+  review: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      message: String,
+      rating: Number,
+    },
+  ],
+  rating: {
+    type: String,
+    default: "0",
+  },
+  date: {
+    type: Date,
+    default: Date.now(),
+  },
+});
+
+let Movie = mongoose.model("Movie", MovieSchema);
+module.exports = Movie;

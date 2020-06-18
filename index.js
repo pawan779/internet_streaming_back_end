@@ -4,12 +4,14 @@ const bodyParser=require("body-parser")
 const morgan=require("morgan")
 const dotenv=require('dotenv').config();
 const app=express();
+const cors=require('cors')
 
 const authRoute=require('./src/routes/auth')
 
 
 app.use(bodyParser.json())
 app.use(morgan("tiny"))
+app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
 
