@@ -7,6 +7,7 @@ const Genre = require("../model/genre");
 const requireAuth = require("../middleware/requireAuth");
 
 router.get("/", requireAuth, async (req, res) => {
+    
   try {
     const response = await Movie.find({});
     res.json(response);
