@@ -7,10 +7,22 @@ const Genre = require("../model/genre");
 const requireAuth = require("../middleware/requireAuth");
 
 router.get("/", requireAuth, async (req, res) => {
-    
   try {
     const response = await Movie.find({});
     res.json(response);
+  } catch (err) {
+    return res.status(500).send({ error: "Something went wrong!" });
+  }
+});
+
+//get movie by id
+
+router.get("/:id", requireAuth, async (req, res) => {
+  try {
+    const data = await Movie.findById({ _id: req.params.id });
+    res.json({
+      data,
+    });
   } catch (err) {
     return res.status(500).send({ error: "Something went wrong!" });
   }
