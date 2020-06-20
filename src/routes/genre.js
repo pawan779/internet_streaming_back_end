@@ -22,6 +22,14 @@ router
       return res.status(500).send({ error: "Something went wrong!!" });
     }
   })
- 
+  //to get all genre
+  .get(requireAuth, async (req, res) => {
+    try {
+      const genre = await Genre.find({});
+      res.json(genre);
+    } catch (err) {
+      return res.status(500).send({ error: "Something went wrong!!" });
+    }
+  });
 
 module.exports = router;
