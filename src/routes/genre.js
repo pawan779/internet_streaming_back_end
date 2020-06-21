@@ -15,7 +15,7 @@ router
     const isMatch = await Genre.findOne({ name });
 
     if (isMatch) {
-      res.status(409).send({ error: "Genre already exists!!" });
+      return res.status(409).send({ error: "Genre already exists!!" });
     }
     try {
       const genre = await Genre.create({ name });
@@ -45,8 +45,9 @@ router
 
     const isMatch = await Genre.findOne({ name });
     if (isMatch) {
-      res.status(409).send({ error: "Genre already exists!!" });
+      return res.status(409).send({ error: "Genre already exists!!" });
     }
+
     try {
       const response = await Genre.findByIdAndUpdate({ _id: id }, { name });
       const genre = await Genre.findOne({ _id: id });
