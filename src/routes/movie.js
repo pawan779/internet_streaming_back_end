@@ -16,8 +16,24 @@ router
       return res.status(500).send({ error: "Something went wrong!" });
     }
   })
-  .post(requireAuth,async(req,res)=>{
-    const {name,des}
+  .post(requireAuth, async (req, res) => {
+    //to add new movie
+    const {
+      name,
+      description,
+      actor,
+      duration,
+      release,
+      image,
+      video,
+      genre,
+    } = req.body;
+    try {
+      const movie = await Movie.create(req.body);
+      res.json(movie);
+    } catch (err) {
+      return res.status(500).send({ error: "Something went wrong!" });
+    }
   });
 
 //get movie by id
