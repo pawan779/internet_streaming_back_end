@@ -9,6 +9,7 @@ const cors = require("cors");
 const authRoute = require("./src/routes/auth");
 const movieRoute = require("./src/routes/movie");
 const genreRoute = require("./src/routes/genre");
+const uploadRoute=require("./src/routes/upload")
 
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
@@ -36,6 +37,7 @@ mongoose.connection.on("error", (err) => {
 app.use("/", authRoute);
 app.use("/movie", movieRoute);
 app.use("/genre", genreRoute);
+app.use("/",uploadRoute)
 
 // server connection
 app.listen(process.env.PORT, () => {

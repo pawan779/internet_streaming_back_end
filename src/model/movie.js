@@ -10,6 +10,15 @@ const MovieSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
+  actor: {
+    type: String,
+  },
+  duration: {
+    type: String,
+  },
+  release: {
+    type: String,
+  },
   image: {
     type: String,
   },
