@@ -28,6 +28,11 @@ router
       video,
       genre,
     } = req.body;
+
+    const isMatch = await Movie.findOne({ name });
+    if (isMatch) {
+      return res.status(409).send({ error: "Movie Name already exists!!" });
+    }
     try {
       const movie = await Movie.create(req.body);
       res.json(movie);
@@ -38,15 +43,36 @@ router
 
 //get movie by id
 
-router.get("/:id", requireAuth, async (req, res) => {
-  try {
-    const data = await Movie.findById({ _id: req.params.id });
+router
+  .route("/:id")
+  .get(requireAuth, async (req, res) => {
+    try {
+      const data = await Movie.findById({ _id: req.params.id });
+      res.json({
+        data,
+      });
+    } catch (err) {
+      return res.status(500).send({ error: "Something went wrong!" });
+    }
+  })
+  .put(requireAuth, async (req, res) => {
+    const response = await Movie.findByIdAndUpdate(
+      { _id: req.params.id },
+      req.body
+    );
+
+    try {
+      const result = await Movie.findOne({ _id: req.params.id });
+      res.json(result);
+    } catch (err) {
+      console.log(err);
+    }
+  })
+  .delete(requireAuth, async (req, res) => {
+    const response = await Movie.findByIdAndDelete({ _id: req.params.id });
     res.json({
-      data,
+      message: "Deleted Sucessfully",
     });
-  } catch (err) {
-    return res.status(500).send({ error: "Something went wrong!" });
-  }
-});
+  });
 
 module.exports = router;
