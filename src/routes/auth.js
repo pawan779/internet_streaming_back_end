@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 
 
 const User = require("../model/user");
+const requireAuth = require("../middleware/requireAuth");
 
 router.post("/signup", async (req, res) => {
   const { email, password } = req.body;
@@ -60,6 +61,15 @@ router.post("/signin", async (req, res) => {
     });
   } catch (err) {
     res.status(422).send({ error: "Invalid email or password" });
+  }
+});
+
+router.get("/me", requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById({ _id: req.user._id });
+    res.json(user);
+  } catch (err) {
+    res.status(422).send({ error: "No user found" });
   }
 });
 
