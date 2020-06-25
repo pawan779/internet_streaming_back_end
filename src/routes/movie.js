@@ -114,27 +114,41 @@ router.get("/search/:id", requireAuth, async (req, res) => {
 });
 
 // for addming review
-router.post("/review/:id", requireAuth, async (req, res) => {
-  const { message, rating } = req.body;
-  try {
-    let movie = await Movie.findOne({ _id: req.params.id });
+router
+  .route("/review/:id")
+  .post(requireAuth, async (req, res) => {
+    const { message, rating } = req.body;
+    try {
+      let movie = await Movie.findOne({ _id: req.params.id });
 
-    if (movie) {
-      movie.review.push({ userId: req.user._id, message, rating });
+      if (movie) {
+        movie.review.push({ userId: req.user._id, message, rating });
 
-      const newRating = parseFloat(movie.rating) * (movie.review.length - 1);
-      const totalRating = newRating + parseFloat(rating);
-      const finalRating = totalRating / movie.review.length;
+        const newRating = parseFloat(movie.rating) * (movie.review.length - 1);
+        const totalRating = newRating + parseFloat(rating);
+        const finalRating = totalRating / movie.review.length;
 
-      movie = await movie.save();
-      await movie.updateOne({ rating: finalRating });
-      const result = await Movie.findOne({ _id: req.params.id });
-      return res.status(201).send(result);
+        movie = await movie.save();
+        await movie.updateOne({ rating: finalRating });
+        const result = await Movie.findOne({ _id: req.params.id });
+        return res.status(201).send(result);
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Something went wrong");
     }
-  } catch (err) {
-    console.log(err);
-    res.status(500).send("Something went wrong");
-  }
-});
+  })
+  .get(requireAuth, async (req, res) => {
+    const movie = await Movie.findOne({ _id: req.params.id });
+    if (!movie) {
+      return res.status(404).send({ error: "Not found" });
+    }
+    try {
+      const user = await User.findOne({ _id: movie.review.userId });
+      res.json(user);
+    } catch (err) {
+      console.log(err);
+    }
+  });
 
 module.exports = router;
