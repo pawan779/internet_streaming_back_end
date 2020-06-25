@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const User = require("../model/user");
 const Genre = require("../model/genre");
 const requireAuth = require("../middleware/requireAuth");
+const Favourite = require("../model/favourite");
 
 router
   .route("/")
@@ -74,5 +75,21 @@ router
       message: "Deleted Sucessfully",
     });
   });
+
+//get favourites movie
+
+router.get("/favourite/movie", requireAuth, async (req, res) => {
+  const fav = await Favourite.findOne({ user: req.user.id });
+  if (!fav) {
+    return res.status(404).send({ error: "Favourites not found" });
+  }
+
+  try {
+    const find = await Movie.find({ "genre._id": fav.genre });
+    return res.json(find);
+  } catch (err) {
+    return res.status(500).send({ error: "Something went wrong!" });
+  }
+});
 
 module.exports = router;
