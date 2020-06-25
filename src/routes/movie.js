@@ -80,15 +80,38 @@ router
 
 router.get("/favourite/movie", requireAuth, async (req, res) => {
   const fav = await Favourite.findOne({ user: req.user.id });
-  if (!fav) {
-    return res.status(404).send({ error: "Favourites not found" });
-  }
 
   try {
+    if (fav == null) {
+      console.log("no user");
+      return res.status(404).send({ error: "Favourite not found" });
+    }
     const find = await Movie.find({ "genre._id": fav.genre });
     return res.json(find);
   } catch (err) {
     return res.status(500).send({ error: "Something went wrong!" });
+  }
+});
+
+//serach for movie
+
+router.get("/search/:id", async (req, res) => {
+  let search = req.params.id;
+  try {
+    const result = await Movie.find({
+      $or: [
+        { name: { $regex: search } },
+        { description: { $regex: search } },
+        { image: { $regex: search } },
+        { video: { $regex: search } },
+        { duration: { $regex: search } },
+        { release: { $regex: search } },
+      ],
+    });
+    console.log(result);
+    res.json({ result });
+  } catch (err) {
+    res.status(404).json({ error: `Search Result for ${search}: Not found` });
   }
 });
 
