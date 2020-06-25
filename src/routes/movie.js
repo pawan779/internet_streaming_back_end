@@ -49,9 +49,7 @@ router
   .get(requireAuth, async (req, res) => {
     try {
       const data = await Movie.findById({ _id: req.params.id });
-      res.json({
-        data,
-      });
+      res.json(data);
     } catch (err) {
       return res.status(500).send({ error: "Something went wrong!" });
     }
@@ -95,7 +93,7 @@ router.get("/favourite/movie", requireAuth, async (req, res) => {
 
 //serach for movie
 
-router.get("/search/:id", async (req, res) => {
+router.get("/search/:id", requireAuth, async (req, res) => {
   let search = req.params.id;
   try {
     const result = await Movie.find({
@@ -109,9 +107,33 @@ router.get("/search/:id", async (req, res) => {
       ],
     });
     console.log(result);
-    res.json({ result });
+    res.json(result);
   } catch (err) {
     res.status(404).json({ error: `Search Result for ${search}: Not found` });
+  }
+});
+
+// for addming review
+router.post("/review/:id", requireAuth, async (req, res) => {
+  const { message, rating } = req.body;
+  try {
+    let movie = await Movie.findOne({ _id: req.params.id });
+
+    if (movie) {
+      movie.review.push({ userId: req.user._id, message, rating });
+
+      const newRating = parseFloat(movie.rating) * (movie.review.length - 1);
+      const totalRating = newRating + parseFloat(rating);
+      const finalRating = totalRating / movie.review.length;
+
+      movie = await movie.save();
+      await movie.updateOne({ rating: finalRating });
+      const result = await Movie.findOne({ _id: req.params.id });
+      return res.status(201).send(result);
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Something went wrong");
   }
 });
 
