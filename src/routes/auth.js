@@ -66,7 +66,7 @@ router.post("/signin", async (req, res) => {
 
 router.get("/me", requireAuth, async (req, res) => {
   try {
-    const user = await User.findById({ _id: req.user._id });
+    const user = await User.findOne({ _id: req.user.id });
     res.json(user);
   } catch (err) {
     res.status(422).send({ error: "No user found" });
