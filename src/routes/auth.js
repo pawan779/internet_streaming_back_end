@@ -3,7 +3,6 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-
 const User = require("../model/user");
 const requireAuth = require("../middleware/requireAuth");
 
@@ -50,7 +49,7 @@ router.post("/signin", async (req, res) => {
     return res.status(422).send({ error: "Invalid email or password" });
   }
   try {
-    const isMatch = await bcrypt.compare(password,user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(422).send({ error: "Invalid email or password" });
     }
@@ -64,13 +63,31 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-router.get("/me", requireAuth, async (req, res) => {
-  try {
-    const user = await User.findOne({ _id: req.user.id });
-    res.json(user);
-  } catch (err) {
-    res.status(422).send({ error: "No user found" });
-  }
-});
+router
+  .route("/me")
+  .get(requireAuth, async (req, res) => {
+    try {
+      const user = await User.findOne({ _id: req.user.id });
+      res.json(user);
+    } catch (err) {
+      res.status(422).send({ error: "No user found" });
+    }
+  })
+
+  .put(requireAuth, async (req, res) => {
+    const { name, address, phone, image } = req.body;
+    try {
+      const user = await User.findByIdAndUpdate(
+        { _id: req.user.id },
+        { name, address, phone, image }
+      );
+
+      const response = await User.findOne({ _id: req.user.id });
+
+      res.json(response);
+    } catch (err) {
+      res.status(406).send("Unauthorized");
+    }
+  });
 
 module.exports = router;

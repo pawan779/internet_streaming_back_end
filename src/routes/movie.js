@@ -153,16 +153,14 @@ router
 
 //to update views
 
-router.put("/views/:id", async (req, res) => {
-  const { views } = req.body;
-  const response = await Movie.findByIdAndUpdate(
-    { _id: req.params.id },
-    { views }
-  );
+router.put("/views/:id", requireAuth, async (req, res) => {
   try {
+    const response = await Movie.findByIdAndUpdate(
+      { _id: req.params.id },
+      req.body
+    );
     const result = await Movie.findOne({ _id: req.params.id });
     res.json(result);
-    console.log(result);
   } catch (err) {
     res.status(500).send(err);
   }
