@@ -34,8 +34,10 @@ router
     if (isMatch) {
       return res.status(409).send({ error: "Movie Name already exists!!" });
     }
+    console.log(req.body);
     try {
       const movie = await Movie.create(req.body);
+
       res.json(movie);
     } catch (err) {
       return res.status(500).send({ error: "Something went wrong!" });
@@ -164,6 +166,12 @@ router.put("/views/:id", requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
+});
+
+router.get("/trending", requireAuth, async (req, res) => {
+  const sort = { views: 1 };
+  const movie = await Movie.find({}).sort(sort);
+  res.json(movie);
 });
 
 module.exports = router;

@@ -8,7 +8,6 @@ router
   .route("/")
   .post(requireAuth, async (req, res) => {
     const user = await Favourite.findOne({ user: req.user.id });
-    console.log(req.body);
     try {
       if (user) {
         user.genre = req.body;
