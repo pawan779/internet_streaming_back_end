@@ -174,4 +174,11 @@ router.get("/trending", requireAuth, async (req, res) => {
   res.json(movie);
 });
 
+//find all the movie with category
+
+router.get("/category/:id", async (req, res) => {
+  const movie = await Movie.find({ "category.categoryId": req.params.id });
+  res.json(movie);
+});
+
 module.exports = router;
