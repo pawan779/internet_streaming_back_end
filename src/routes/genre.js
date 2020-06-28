@@ -35,6 +35,15 @@ router
   });
 router
   .route("/:id")
+  .get(async (req, res) => {
+    const { id } = req.params;
+    try {
+      const genre = await Genre.findById({ _id: id });
+      res.json(genre);
+    } catch (err) {
+      return res.status(500).send({ error: "Something went wrong!!" });
+    }
+  })
   .put(requireAuth, async (req, res) => {
     const { name } = req.body;
     const { id } = req.params;

@@ -76,13 +76,29 @@ router
     });
   });
 
+//get trending movie
+router.get("/trending/movie", requireAuth, async (req, res) => {
+  const sort = { views: -1 };
+  const movie = await Movie.find({})
+    .sort(sort)
+    .collation({ locale: "en_US", numericOrdering: true });
+  res.json(movie);
+});
+
+//get latest movie
+router.get("/latest/movie", requireAuth, async (req, res) => {
+  const sort = { _id: -1 };
+  const movie = await Movie.find({}).sort(sort);
+  res.json(movie);
+});
+
 //get favourites movie
 
 router.get("/favourite/movie", requireAuth, async (req, res) => {
   const fav = await Favourite.findOne({ user: req.user.id });
 
   try {
-    if (fav == null) {
+    if (fav.length < 1) {
       console.log("no user");
       return res.status(404).send({ error: "Favourite not found" });
     }
@@ -168,16 +184,10 @@ router.put("/views/:id", requireAuth, async (req, res) => {
   }
 });
 
-router.get("/trending", requireAuth, async (req, res) => {
-  const sort = { views: 1 };
-  const movie = await Movie.find({}).sort(sort);
-  res.json(movie);
-});
+//find all the movie with genre
 
-//find all the movie with category
-
-router.get("/category/:id", async (req, res) => {
-  const movie = await Movie.find({ "category.categoryId": req.params.id });
+router.get("/genre/:id", requireAuth, async (req, res) => {
+  const movie = await Movie.find({ "genre._id": req.params.id });
   res.json(movie);
 });
 
