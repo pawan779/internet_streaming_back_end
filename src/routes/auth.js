@@ -90,4 +90,21 @@ router
     }
   });
 
+//find all users
+
+router.get("/user/all", requireAuth, async (req, res) => {
+  const user = await User.find({}).sort({ _id: -1 });
+  res.json(user);
+});
+
+//to get user by id
+
+router.route("/user/:id").get(requireAuth, async (req, res) => {
+  try {
+    const user = await User.findById({ _id: req.params.id });
+    res.json(user);
+  } catch (err) {
+    return res.status(500).send({ error: "Something went wrong!" });
+  }
+});
 module.exports = router;

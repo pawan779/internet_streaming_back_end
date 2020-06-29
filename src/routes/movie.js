@@ -140,7 +140,7 @@ router
       let movie = await Movie.findOne({ _id: req.params.id });
 
       if (movie) {
-        movie.review.push({ userId: req.user._id, message, rating });
+        movie.review.push({ user: req.user._id, message, rating });
 
         const newRating = parseFloat(movie.rating) * (movie.review.length - 1);
         const totalRating = newRating + parseFloat(rating);
