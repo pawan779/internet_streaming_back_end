@@ -93,18 +93,35 @@ router
 //find all users
 
 router.get("/user/all", requireAuth, async (req, res) => {
-  const user = await User.find({}).sort({ _id: -1 });
+  const user = await User.find({ isAdmin: false }).sort({ _id: -1 });
   res.json(user);
 });
 
 //to get user by id
 
-router.route("/user/:id").get(requireAuth, async (req, res) => {
-  try {
-    const user = await User.findById({ _id: req.params.id });
-    res.json(user);
-  } catch (err) {
-    return res.status(500).send({ error: "Something went wrong!" });
-  }
-});
+router
+  .route("/user/:id")
+  .get(requireAuth, async (req, res) => {
+    try {
+      const user = await User.findById({ _id: req.params.id });
+      res.json(user);
+    } catch (err) {
+      return res.status(500).send({ error: "Something went wrong!" });
+    }
+  })
+  .put(requireAuth, async (req, res) => {
+    const { name, address, phone, image } = req.body;
+    try {
+      const user = await User.findByIdAndUpdate(
+        { _id: req.params.id },
+        { name, address, phone, image }
+      );
+
+      const response = await User.findOne({ _id: req.params.id });
+
+      res.json(response);
+    } catch (err) {
+      res.status(406).send("Unauthorized");
+    }
+  });
 module.exports = router;
