@@ -123,5 +123,9 @@ router
     } catch (err) {
       res.status(406).send("Unauthorized");
     }
+  })
+  .delete(requireAuth, async (req, res) => {
+    const user = await User.findByIdAndDelete({ _id: req.params.id });
+    res.json({ message: "Deleted Sucessfully!!" });
   });
 module.exports = router;
