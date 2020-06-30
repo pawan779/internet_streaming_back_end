@@ -112,16 +112,15 @@ router.get("/favourite/movie", requireAuth, async (req, res) => {
 //serach for movie
 
 router.get("/search/:id", requireAuth, async (req, res) => {
-  let search = req.params.id;
+  const id = req.params.id;
+  let search = id.replace(/^./, id[0].toUpperCase());
   try {
     const result = await Movie.find({
       $or: [
         { name: { $regex: search } },
-        { description: { $regex: search } },
-        { image: { $regex: search } },
-        { video: { $regex: search } },
         { duration: { $regex: search } },
         { release: { $regex: search } },
+        { actor: { $regex: search } },
       ],
     });
     console.log(result);

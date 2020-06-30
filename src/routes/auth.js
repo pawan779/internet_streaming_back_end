@@ -128,4 +128,30 @@ router
     const user = await User.findByIdAndDelete({ _id: req.params.id });
     res.json({ message: "Deleted Sucessfully!!" });
   });
+
+//to change password
+
+router.post("/change/password", requireAuth, async (req, res) => {
+  const user = await User.findOne({ _id: req.user.id });
+  if (!user) {
+    return res.status(404).send({ error: "No user found" });
+  }
+
+  const isMatch = await bcrypt.compare(req.body.password, user.password);
+  if (!isMatch) {
+    return res.status(422).send({ error: "Password donot match" });
+  }
+  //if matched changed the password
+  let newPwd = req.body.newPassword;
+  await bcrypt.hash(newPwd, 10, async (err, hash) => {
+    if (err) {
+      let err = new Error("Could not hash!");
+      err.status = 500;
+      return next(err);
+    }
+    user.password = hash;
+    await user.save();
+    res.json({ message: "Password changed" });
+  });
+});
 module.exports = router;
