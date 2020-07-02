@@ -1,12 +1,11 @@
 const express = require("express");
-const requireAuth = require("../middleware/requireAuth");
 const User = require("../model/user");
 const Favourite = require("../model/favourite");
 const router = express.Router();
 
 router
   .route("/")
-  .post(requireAuth, async (req, res) => {
+  .post( async (req, res) => {
     const user = await Favourite.findOne({ user: req.user.id });
     try {
       if (user) {
@@ -23,7 +22,7 @@ router
       return res.status(500).send({ error: "Something went wrong!" });
     }
   })
-  .get(requireAuth, async (req, res) => {
+  .get( async (req, res) => {
     const fav = await Favourite.findOne({ user: req.user.id });
     if (fav.length < 1) {
       return res.status(404).send({ error: "Favoourites not found" });

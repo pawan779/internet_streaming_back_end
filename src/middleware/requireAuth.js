@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const User = mongoose.model("User");
 
-module.exports = (req, res, next) => {
+module.exports.verifyUser = (req, res, next) => {
   //automatically convert to small letter Authorizatiom
   const { authorization } = req.headers;
 

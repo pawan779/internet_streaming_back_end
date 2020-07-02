@@ -11,6 +11,7 @@ const movieRoute = require("./src/routes/movie");
 const genreRoute = require("./src/routes/genre");
 const uploadRoute = require("./src/routes/upload");
 const favouriteRoute = require("./src/routes/favourite");
+const requireAuth = require("./src/middleware/requireAuth");
 
 app.use(bodyParser.json());
 app.use(morgan("tiny"));
@@ -36,9 +37,11 @@ mongoose.connection.on("error", (err) => {
 });
 
 app.use("/", authRoute);
+app.use("/", uploadRoute);
+app.use(requireAuth.verifyUser);
 app.use("/movie", movieRoute);
 app.use("/genre", genreRoute);
-app.use("/", uploadRoute);
+
 app.use("/favourite", favouriteRoute);
 
 // server connection

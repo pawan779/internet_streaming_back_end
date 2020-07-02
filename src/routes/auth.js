@@ -65,7 +65,7 @@ router.post("/signin", async (req, res) => {
 
 router
   .route("/me")
-  .get(requireAuth, async (req, res) => {
+  .get(requireAuth.verifyUser, async (req, res) => {
     try {
       const user = await User.findOne({ _id: req.user.id });
       res.json(user);
@@ -74,7 +74,7 @@ router
     }
   })
 
-  .put(requireAuth, async (req, res) => {
+  .put(requireAuth.verifyUser, async (req, res) => {
     const { name, address, phone, image } = req.body;
     try {
       const user = await User.findByIdAndUpdate(
@@ -92,16 +92,21 @@ router
 
 //find all users
 
-router.get("/user/all", requireAuth, async (req, res) => {
-  const user = await User.find({ isAdmin: false }).sort({ _id: -1 });
-  res.json(user);
-});
+router.get(
+  "/user/all",
+  requireAuth.verifyUser,
+  requireAuth.verifyAdmin,
+  async (req, res) => {
+    const user = await User.find({ isAdmin: false }).sort({ _id: -1 });
+    res.json(user);
+  }
+);
 
 //to get user by id
 
 router
   .route("/user/:id")
-  .get(requireAuth, async (req, res) => {
+  .get(requireAuth.verifyUser, requireAuth.verifyAdmin, async (req, res) => {
     try {
       const user = await User.findById({ _id: req.params.id });
       res.json(user);
@@ -109,7 +114,7 @@ router
       return res.status(500).send({ error: "Something went wrong!" });
     }
   })
-  .put(requireAuth, async (req, res) => {
+  .put(requireAuth.verifyUser, requireAuth.verifyAdmin, async (req, res) => {
     const { name, address, phone, image } = req.body;
     try {
       const user = await User.findByIdAndUpdate(
@@ -124,14 +129,14 @@ router
       res.status(406).send("Unauthorized");
     }
   })
-  .delete(requireAuth, async (req, res) => {
+  .delete(requireAuth.verifyUser, requireAuth.verifyAdmin, async (req, res) => {
     const user = await User.findByIdAndDelete({ _id: req.params.id });
     res.json({ message: "Deleted Sucessfully!!" });
   });
 
 //to change password
 
-router.post("/change", requireAuth, async (req, res) => {
+router.post("/change", requireAuth.verifyUser, async (req, res) => {
   const user = await User.findOne({ _id: req.user.id });
 
   if (!user) {

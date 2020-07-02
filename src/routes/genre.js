@@ -1,12 +1,12 @@
 const express = require("express");
-const requireAuth = require("../middleware/requireAuth");
 const Genre = require("../model/genre");
+const requiredAuth=require("../middleware/requireAuth")
 const router = express.Router();
 
 // add new genre
 router
   .route("/")
-  .post(requireAuth, async (req, res) => {
+  .post(requiredAuth.verifyAdmin, async (req, res) => {
     const { name } = req.body;
     if (!name) {
       return res.status(422).send({ error: "Genre Name is required" });
@@ -25,7 +25,7 @@ router
     }
   })
   //to get all genre
-  .get(requireAuth, async (req, res) => {
+  .get( async (req, res) => {
     try {
       const genre = await Genre.find({});
       res.json(genre);
@@ -44,7 +44,7 @@ router
       return res.status(500).send({ error: "Something went wrong!!" });
     }
   })
-  .put(requireAuth, async (req, res) => {
+  .put(requiredAuth.verifyAdmin, async (req, res) => {
     const { name } = req.body;
     const { id } = req.params;
 
@@ -65,7 +65,8 @@ router
       return res.status(500).send({ error: "Something went wrong!!" });
     }
   })
-  .delete(requireAuth, async (req, res) => {
+  .delete(requiredAuth.verifyAdmin, async (req, res) => {
+    console.log(req.params.id)
     const { id } = req.params;
     try {
       const genre = await Genre.findByIdAndDelete({ _id: id });

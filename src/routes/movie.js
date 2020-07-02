@@ -4,12 +4,12 @@ const Movie = require("../model/movie");
 const mongoose = require("mongoose");
 const User = require("../model/user");
 const Genre = require("../model/genre");
-const requireAuth = require("../middleware/requireAuth");
 const Favourite = require("../model/favourite");
+const requiredAuth=require("../middleware/requireAuth")
 
 router
   .route("/")
-  .get(requireAuth, async (req, res) => {
+  .get( async (req, res) => {
     try {
       const response = await Movie.find({});
       res.json(response);
@@ -17,7 +17,7 @@ router
       return res.status(500).send({ error: "Something went wrong!" });
     }
   })
-  .post(requireAuth, async (req, res) => {
+  .post( requiredAuth.verifyAdmin, async (req, res) => {
     //to add new movie
     const {
       name,
@@ -48,7 +48,7 @@ router
 
 router
   .route("/:id")
-  .get(requireAuth, async (req, res) => {
+  .get( async (req, res) => {
     try {
       const data = await Movie.findById({ _id: req.params.id });
       res.json(data);
@@ -56,7 +56,7 @@ router
       return res.status(500).send({ error: "Something went wrong!" });
     }
   })
-  .put(requireAuth, async (req, res) => {
+  .put( requiredAuth.verifyAdmin,async (req, res) => {
     const response = await Movie.findByIdAndUpdate(
       { _id: req.params.id },
       req.body
@@ -69,7 +69,7 @@ router
       console.log(err);
     }
   })
-  .delete(requireAuth, async (req, res) => {
+  .delete(requiredAuth.verifyAdmin, async (req, res) => {
     const response = await Movie.findByIdAndDelete({ _id: req.params.id });
     res.json({
       message: "Deleted Sucessfully",
@@ -77,7 +77,7 @@ router
   });
 
 //get trending movie
-router.get("/trending/movie", requireAuth, async (req, res) => {
+router.get("/trending/movie",  async (req, res) => {
   const sort = { views: -1 };
   const movie = await Movie.find({})
     .sort(sort)
@@ -86,7 +86,7 @@ router.get("/trending/movie", requireAuth, async (req, res) => {
 });
 
 //get latest movie
-router.get("/latest/movie", requireAuth, async (req, res) => {
+router.get("/latest/movie",  async (req, res) => {
   const sort = { _id: -1 };
   const movie = await Movie.find({}).sort(sort);
   res.json(movie);
@@ -94,7 +94,7 @@ router.get("/latest/movie", requireAuth, async (req, res) => {
 
 //get favourites movie
 
-router.get("/favourite/movie", requireAuth, async (req, res) => {
+router.get("/favourite/movie",  async (req, res) => {
   const fav = await Favourite.findOne({ user: req.user.id });
 
   try {
@@ -111,7 +111,7 @@ router.get("/favourite/movie", requireAuth, async (req, res) => {
 
 //serach for movie
 
-router.get("/search/:id", requireAuth, async (req, res) => {
+router.get("/search/:id",  async (req, res) => {
   const id = req.params.id;
   let search = id.replace(/^./, id[0].toUpperCase());
   try {
@@ -133,7 +133,7 @@ router.get("/search/:id", requireAuth, async (req, res) => {
 // for addming review
 router
   .route("/review/:id")
-  .post(requireAuth, async (req, res) => {
+  .post( async (req, res) => {
     const { message, rating } = req.body;
     try {
       let movie = await Movie.findOne({ _id: req.params.id });
@@ -155,7 +155,7 @@ router
       res.status(500).send("Something went wrong");
     }
   })
-  .get(requireAuth, async (req, res) => {
+  .get( async (req, res) => {
     const movie = await Movie.findOne({ _id: req.params.id });
     if (!movie) {
       return res.status(404).send({ error: "Not found" });
@@ -170,7 +170,7 @@ router
 
 //to update views
 
-router.put("/views/:id", requireAuth, async (req, res) => {
+router.put("/views/:id",  async (req, res) => {
   try {
     const response = await Movie.findByIdAndUpdate(
       { _id: req.params.id },
@@ -185,7 +185,7 @@ router.put("/views/:id", requireAuth, async (req, res) => {
 
 //find all the movie with genre
 
-router.get("/genre/:id", requireAuth, async (req, res) => {
+router.get("/genre/:id",  async (req, res) => {
   const movie = await Movie.find({ "genre._id": req.params.id });
   res.json(movie);
 });
