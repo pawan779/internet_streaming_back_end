@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
     return res.status(401).send({ error: "You must be logged in" });
   }
 
-  const token = authorization.replace("Bearer ", "");
+  const token = authorization.split(" ")[1];
   jwt.verify(token, process.env.SECRET, async (err, payload) => {
     if (err) {
       return res.status(401).send({ error: "You must be logged in" });
@@ -27,4 +27,16 @@ module.exports = (req, res, next) => {
   });
 };
 
-
+module.exports.verifyAdmin = (req, res, next) => {
+  if (!req.user) {
+    let err = new Error("Unauthorized");
+    err.status = 401;
+    return next(err);
+  }
+  if (req.user.isAdmin !== true) {
+    let err = new Error("Forbidden");
+    err.status = 403;
+    return next(err);
+  }
+  next();
+};

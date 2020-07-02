@@ -131,8 +131,9 @@ router
 
 //to change password
 
-router.post("/change/password", requireAuth, async (req, res) => {
+router.post("/change", requireAuth, async (req, res) => {
   const user = await User.findOne({ _id: req.user.id });
+
   if (!user) {
     return res.status(404).send({ error: "No user found" });
   }
@@ -149,6 +150,7 @@ router.post("/change/password", requireAuth, async (req, res) => {
       err.status = 500;
       return next(err);
     }
+
     user.password = hash;
     await user.save();
     res.json({ message: "Password changed" });

@@ -25,6 +25,9 @@ router
   })
   .get(requireAuth, async (req, res) => {
     const fav = await Favourite.findOne({ user: req.user.id });
+    if (fav.length < 1) {
+      return res.status(404).send({ error: "Favoourites not found" });
+    }
     res.json(fav);
   });
 
