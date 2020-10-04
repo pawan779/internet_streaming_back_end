@@ -48,3 +48,5 @@ app.use("/favourite", favouriteRoute);
 app.listen(process.env.PORT, () => {
   console.log(`Connected on port ${process.env.PORT}`);
 });
+
+module.exports = app;
